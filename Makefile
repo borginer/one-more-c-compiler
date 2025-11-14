@@ -1,21 +1,23 @@
-CC = clang++
-CFLAGS = -Wextra -Wall -std=c++20
-ROOT = src
-BIN = bin
-OBJS=$(BIN)/main.o
+CXX = clang++
+CXXFLAGS = -std=c++20 -O2 -Wall -Wextra -Iinclude
 
-main: main.o lexer.o utils.o
-	$(CC) $(CFLAGS) -o main main.o lexer.o utils.o
+SRC = $(shell find src -name "*.cpp")
+OBJ = $(patsubst src/%.cpp, build/%.o, $(SRC))
 
-main.o: $(ROOT)/main.cpp 
-	$(CC) $(CFLAGS) -c $(ROOT)/main.cpp
+TARGET = bin/borgc
 
-lexer.o: $(ROOT)/lexer.cpp utils.o
-	$(CC) $(CFLAGS) -c $(ROOT)/lexer.cpp
+all: dirs $(TARGET)  
 
-utils.o: $(ROOT)/utils.cpp
-	$(CC) $(CFLAGS) -c $(ROOT)/utils.cpp
+$(TARGET): $(OBJ)
+	$(CXX) $(OBJ) -o $@
+
+build/%.o: src/%.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+dirs: 
+	mkdir -p build
+	mkdir -p bin
 
 clean:
-	rm -rf *.o
-	rm main	
+	rm -rf build bin

@@ -3,3 +3,7 @@
 *.c
 *.s
 main
+bin
+build
+.vscode
+.clang-format
