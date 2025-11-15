@@ -5,7 +5,7 @@ SRC = $(shell find src -name "*.cpp")
 OBJ = $(patsubst src/%.cpp, build/%.o, $(SRC))
 DEP = $(OBJ:.o=.d)
 
-TARGET = bin/borgc
+TARGET = bin/omcc
 
 all: dirs $(TARGET)
 
