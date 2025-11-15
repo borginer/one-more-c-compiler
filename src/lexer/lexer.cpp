@@ -22,7 +22,7 @@ unordered_map<string, token::Type> KEYWORDS = {
 Lexer::Lexer(string input) : input(input) { cout << input << endl; }
 
 void Lexer::addToken(token::Type tt, string val) {
-    tokens.push_back(token::Token(tt, val, line));
+    tokens.emplace_back(tt, val, line);
 }
 
 bool Lexer::isAtEnd() { return index >= input.size(); }

@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <memory>
 
 #include "token/token.hpp"
 
@@ -31,50 +32,46 @@ string Node::toString() {
     }
 }
 
-AST::AST(vector<token::Token> tokens) : tokens(tokens) {}
+AST::AST(vector<token::Token> tokens) : tokens(std::move(tokens)) {}
 
-token::Token& AST::expect(token::Type type) {
+const token::Token& AST::expect(token::Type type) {
     if (index < tokens.size() && tokens[index].type == type) {
         index++;
         return tokens[index - 1];
     } else {
-        cerr << "unexpected token: " << tokens[index].toString() << endl;
+        cerr << "unexpected token: " << tokens[index].toString() << " on line "
+             << tokens[index].line << endl;
         exit(3);
     }
 }
 
-Node* AST::parseFunctionDef() {
+unique_ptr<Node> AST::parseFunctionDef() {
+    auto function_def = make_unique<Node>(FUNCTION_DEF);
+
     expect(token::INT);
-    string identifier = expect(token::IDENTIFIER).value;
+    function_def->name = expect(token::IDENTIFIER).value;
     expect(token::OPEN_BRACE);
     expect(token::VOID);
     expect(token::CLOSE_BRACE);
     expect(token::OPEN_PARENTH);
-    Node* statement = parseStatement();
+    function_def->children.push_back(parseStatement());
     expect(token::CLOSE_PARENTH);
-
-    Node* function_def = new Node(FUNCTION_DEF);
-    function_def->children.push_back(statement);
-    function_def->name = identifier;
     return function_def;
 }
 
-Node* AST::parseStatement() {
-    expect(token::RETURN);
-    Node* exp = parseExp();
-    expect(token::SEMICOLON);
-
-    Node* statement = new Node(STATEMENT);
+unique_ptr<Node> AST::parseStatement() {
+    auto statement = make_unique<Node>(STATEMENT);
     statement->value = "return";
-    statement->children.push_back(exp);
+
+    expect(token::RETURN);
+    statement->children.push_back(parseExp());
+    expect(token::SEMICOLON);
     return statement;
 }
 
-Node* AST::parseExp() {
-    string constant = parseInt();
-
-    Node* exp = new Node(EXP);
-    exp->value = constant;
+unique_ptr<Node> AST::parseExp() {
+    auto exp = make_unique<Node>(EXP);
+    exp->value = parseInt();
     return exp;
 }
 
@@ -82,15 +79,17 @@ string AST::parseInt() { return expect(token::NUMBER).value; }
 
 string AST::parseIdentifier() { return expect(token::IDENTIFIER).value; }
 
-Node* AST::ParseProgram() {
-    tree_head = new Node(PROGRAM);
+unique_ptr<Node> AST::ParseProgram() {
+    auto tree_head = make_unique<Node>(PROGRAM);
     tree_head->children.push_back(parseFunctionDef());
     return tree_head;
 }
 
-void AST::PrintProgram() { AST::printProgram(tree_head); }
+void AST::PrintProgram(unique_ptr<Node>& treeHead) {
+    AST::printProgram(treeHead);
+}
 
-void AST::printProgram(Node* node) {
+void AST::printProgram(unique_ptr<Node>& node) {
     string tab = "   ";
 
     for (size_t i = 0; i < scope; i++) {
@@ -99,7 +98,7 @@ void AST::printProgram(Node* node) {
     cout << node->toString() << endl;
 
     scope++;
-    for (Node* child : node->children) {
+    for (auto& child : node->children) {
         printProgram(child);
     }
     scope--;

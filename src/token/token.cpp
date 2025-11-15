@@ -3,10 +3,7 @@
 using namespace std;
 using namespace token;
 
-Token::Token(Type tt, string value, size_t line)
-    : type(tt), value(value), line(line) {}
-
-string Token::toString() {
+string Token::toString() const {
     switch (type) {
         case OPEN_BRACE:
             return "(";

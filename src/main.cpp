@@ -4,6 +4,7 @@
 
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
+#include "token/token.hpp"
 
 using namespace std;
 
@@ -24,7 +25,8 @@ int main(int argc, char* argv[]) {
     tok.PrintTokens();
 
     cout << endl;
-    ast::AST ast = ast::AST(tokens);
-    ast.ParseProgram();
-    ast.PrintProgram();
+    ast::AST ast = ast::AST(std::move(tokens));
+    tokens.push_back(token::Token(token::IDENTIFIER, " ", 2));
+    auto program_ast = ast.ParseProgram();
+    ast.PrintProgram(program_ast);
 }

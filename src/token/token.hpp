@@ -21,13 +21,11 @@ enum Type {
     _EOF
 };
 
-class Token {
-   public:
+struct Token {
     Type type;
     std::string value;
     std::size_t line;
 
-    Token(Type tt, std::string val, size_t line);
-    std::string toString();
+    std::string toString() const;
 };
 }  // namespace token
