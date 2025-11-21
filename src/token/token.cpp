@@ -1,4 +1,5 @@
 #include "token.hpp"
+#include <iostream>
 
 using namespace std;
 using namespace token;
@@ -33,3 +34,14 @@ string Token::toString() const {
 }
 
 Tokens::Tokens(vector<token::Token> tokens) : tokens(std::move(tokens)) {}
+
+const token::Token& token::Tokens::expect(token::Type type) {
+    if (index < tokens.size() && tokens[index].type == type) {
+        index++;
+        return tokens[index - 1];
+    } else {
+        cerr << "unexpected token: " << tokens[index].toString() << " on line "
+             << tokens[index].line << endl;
+        exit(3);
+    }
+}

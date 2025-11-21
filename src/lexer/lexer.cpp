@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "utils/string.hpp"
+
 using namespace std;
 using namespace lexer;
 
@@ -19,7 +21,7 @@ bool isAlpha(char c) {
 unordered_map<string, token::Type> KEYWORDS = {
     {"return", token::RETURN}, {"int", token::INT}, {"void", token::VOID}};
 
-Lexer::Lexer(string input) : input(input) { }
+Lexer::Lexer(string input) : input(input) {}
 
 void Lexer::addToken(token::Type tt, string val) {
     tokens.emplace_back(tt, val, line);
@@ -111,7 +113,6 @@ vector<token::Token> Lexer::Lex() {
 }
 
 void Lexer::PrintTokens() {
-    string tab = "  ";
     size_t scope = 0;
 
     for (size_t i = 0; i < tokens.size(); i++) {
@@ -126,9 +127,7 @@ void Lexer::PrintTokens() {
 
         if (i > 0 && tokens[i].line != tokens[i - 1].line) {
             cout << '\n';
-            for (size_t i = 0; i < scope; i++) {
-                cout << tab;
-            }
+            cout << util::repeatTabs(scope);
         }
         cout << tokens[i].toString() + " ";
     }

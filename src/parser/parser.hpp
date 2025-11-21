@@ -17,7 +17,23 @@ class Node {
 
 struct Exp : public Node {};
 
+struct Constant : public Exp {
+    std::string value;
+
+   public:
+    Constant(token::Tokens& tokens);
+    std::string toString(size_t scope) override;
+};
+
 struct Statement : public Node {};
+
+class Return : public Statement {
+    std::unique_ptr<Exp> exp;
+
+   public:
+    Return(token::Tokens& tokens);
+    std::string toString(size_t scope) override;
+};
 
 class FunctionDef : public Node {
     std::string name;
@@ -33,22 +49,6 @@ class Program : public Node {
 
    public:
     Program(token::Tokens& tokens);
-    std::string toString(size_t scope) override;
-};
-
-struct Constant : public Exp {
-    std::string value;
-
-   public:
-    Constant(token::Tokens& tokens);
-    std::string toString(size_t scope) override;
-};
-
-class Return : public Statement {
-    std::unique_ptr<Exp> exp;
-
-   public:
-    Return(token::Tokens& tokens);
     std::string toString(size_t scope) override;
 };
 
