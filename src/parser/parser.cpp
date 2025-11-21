@@ -70,6 +70,6 @@ string Program::toString(size_t scope) {
 
 ast::ast(vector<token::Token> tokens) : tokens(std::move(tokens)) {}
 
-unique_ptr<Program> ast::ParseProgram() {
+unique_ptr<Program> ast::Parse() {
     return make_unique<Program>(this->tokens);
 }

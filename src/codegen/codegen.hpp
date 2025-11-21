@@ -66,11 +66,13 @@ struct Program : public Node {
     std::string toString() override;
 };
 
-class ast {
+class asm_ast {
     std::shared_ptr<parser::Program> parser_ast;
 
    public:
-    ast(std::unique_ptr<parser::Program> parser_ast);
-    std::unique_ptr<Program> AsmProgram();
+    asm_ast(std::unique_ptr<parser::Program> parser_ast);
+    std::unique_ptr<Program> Parse();
 };
+
+void EmitAsm(std::string filename, std::unique_ptr<Program> prog);
 }  // namespace codegen

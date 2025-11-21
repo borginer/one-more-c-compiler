@@ -52,6 +52,6 @@ class ast {
 
    public:
     ast(std::vector<token::Token> tokens);
-    std::unique_ptr<Program> ParseProgram();
+    std::unique_ptr<Program> Parse();
 };
 }  // namespace parser

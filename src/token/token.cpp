@@ -1,5 +1,8 @@
 #include "token.hpp"
-#include <iostream>
+
+#include <string>
+
+#include "utils/exceptions.hpp"
 
 using namespace std;
 using namespace token;
@@ -40,8 +43,7 @@ const token::Token& token::Tokens::expect(token::Type type) {
         index++;
         return tokens[index - 1];
     } else {
-        cerr << "unexpected token: " << tokens[index].toString() << " on line "
-             << tokens[index].line << endl;
-        exit(3);
+        throw LexerError("unexpected token " + tokens[index].toString() +
+                         " on line " + to_string(tokens[index].line));
     }
 }

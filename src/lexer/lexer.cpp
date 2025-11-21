@@ -2,11 +2,11 @@
 
 #include <cstddef>
 #include <iostream>
-#include <ostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "utils/exceptions.hpp"
 #include "utils/string.hpp"
 
 using namespace std;
@@ -95,9 +95,8 @@ void Lexer::scanToken() {
             } else if (isAlpha(c)) {
                 scanAlpha();
             } else {
-                cerr << "unexpected character '" << c << "'"
-                     << " on line: " + to_string(line) << endl;
-                exit(2);
+                throw LexerError("unexpected character '" + string(1, c) + "'" +
+                                 " on line: " + to_string(line));
             }
             break;
     }

@@ -1,11 +1,14 @@
 #include "codegen.hpp"
 
 #include <cstddef>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 
 #include "parser/parser.hpp"
+#include "utils/exceptions.hpp"
+#include "utils/string.hpp"
 
 using namespace std;
 using namespace codegen;
@@ -16,8 +19,7 @@ Mov::Mov(shared_ptr<parser::Return> ret) {
     if (auto constant = dynamic_cast<parser::Constant*>(ret->exp.get())) {
         src = make_unique<Imm>(constant->value);
     } else {
-        cerr << "unssuported type" << endl;
-        exit(6);
+        throw CodegenError("unsupported mov type");
     }
 
     dst = make_unique<Register>(reg::EAX);
@@ -43,7 +45,7 @@ Program::Program(shared_ptr<parser::Program> prog) {
 string Ret::toString() { return "ret"; }
 
 string Mov::toString() {
-    return "mov " + src->toString() + ", " + dst->toString();
+    return "movl " + src->toString() + ", " + dst->toString();
 }
 
 string Imm::toString() { return "$" + val; }
@@ -62,9 +64,25 @@ string Program::toString() { return function_def->toString(); }
 
 /* -------------------------------------------------------------------------- */
 
-ast::ast(unique_ptr<parser::Program> parser_ast)
+asm_ast::asm_ast(unique_ptr<parser::Program> parser_ast)
     : parser_ast(std::move(parser_ast)) {}
 
-unique_ptr<Program> ast::AsmProgram() {
+unique_ptr<Program> asm_ast::Parse() {
     return make_unique<Program>(std::move(parser_ast));
+}
+
+void codegen::EmitAsm(string filename, unique_ptr<Program> prog) {
+    std::ofstream out(filename);
+
+    if (!out) {
+        CodegenError("failed to open file \"" + filename + "\"");
+    }
+
+    auto function = prog->function_def;
+
+    out << util::repeatTabs(1) + ".globl _" + function->name;
+    out << "\n_" + function->name + ":";
+    for (auto instr : function->instructions) {
+        out << "\n" + util::repeatTabs(1) + instr->toString();
+    }
 }
