@@ -5,6 +5,7 @@
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
 #include "token/token.hpp"
+#include "codegen/codegen.hpp"
 
 using namespace std;
 
@@ -28,8 +29,12 @@ int main(int argc, char* argv[]) {
     tok.PrintTokens();
 
     cout << endl << "AST:" << endl;
-    ast::AST ast = ast::AST(std::move(tokens));
-    tokens.push_back(token::Token(token::IDENTIFIER, " ", 2));
+    parser::ast ast = parser::ast(std::move(tokens));
     auto program_ast = ast.ParseProgram();
-    cout << program_ast->toString(0) << endl;
+    cout << program_ast->toString() << endl;
+
+    cout << endl << "ASM AST:" << endl;
+    codegen::ast asm_ast = codegen::ast(std::move(program_ast));
+    auto prog_asm_ast = asm_ast.AsmProgram();
+    cout <<  prog_asm_ast->toString() << endl;
 }

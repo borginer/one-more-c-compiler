@@ -3,13 +3,12 @@
 #include <cstddef>
 #include <memory>
 #include <string>
-#include <utility>
 
 #include "token/token.hpp"
 #include "utils/string.hpp"
 
 using namespace std;
-using namespace ast;
+using namespace parser;
 
 /* -------------------------------------------------------------------------- */
 
@@ -19,7 +18,7 @@ Constant::Constant(token::Tokens& tokens) {
 
 Return::Return(token::Tokens& tokens) {
     tokens.expect(token::RETURN);
-    exp = make_unique<Constant>(tokens);
+    exp = make_shared<Constant>(tokens);
     tokens.expect(token::SEMICOLON);
 }
 
@@ -30,12 +29,12 @@ FunctionDef::FunctionDef(token::Tokens& tokens) {
     tokens.expect(token::VOID);
     tokens.expect(token::CLOSE_BRACE);
     tokens.expect(token::OPEN_PARENTH);
-    body = make_unique<Return>(tokens);
+    body = make_shared<Return>(tokens);
     tokens.expect(token::CLOSE_PARENTH);
 }
 
 Program::Program(token::Tokens& tokens) {
-    function = make_unique<FunctionDef>(tokens);
+    function = make_shared<FunctionDef>(tokens);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -69,8 +68,8 @@ string Program::toString(size_t scope) {
 
 /* -------------------------------------------------------------------------- */
 
-AST::AST(vector<token::Token> tokens) : tokens(std::move(tokens)) {}
+ast::ast(vector<token::Token> tokens) : tokens(std::move(tokens)) {}
 
-unique_ptr<Program> AST::ParseProgram() {
+unique_ptr<Program> ast::ParseProgram() {
     return make_unique<Program>(this->tokens);
 }

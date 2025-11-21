@@ -7,9 +7,9 @@
 
 #include "token/token.hpp"
 
-namespace ast {
+namespace parser {
 
-class Node {
+struct Node {
    public:
     virtual ~Node() = default;
     virtual std::string toString(size_t scope) = 0;
@@ -17,46 +17,41 @@ class Node {
 
 struct Exp : public Node {};
 
+struct Statement : public Node {};
+
 struct Constant : public Exp {
     std::string value;
-
-   public:
     Constant(token::Tokens& tokens);
     std::string toString(size_t scope) override;
 };
 
-struct Statement : public Node {};
 
-class Return : public Statement {
-    std::unique_ptr<Exp> exp;
-
-   public:
+struct Return : public Statement {
+    std::shared_ptr<Exp> exp;
     Return(token::Tokens& tokens);
     std::string toString(size_t scope) override;
 };
 
-class FunctionDef : public Node {
-    std::string name;
-    std::unique_ptr<Statement> body;
+struct FunctionDef : public Node {
 
-   public:
+std::string name;
+    std::shared_ptr<Statement> body;
     FunctionDef(token::Tokens& tokens);
     std::string toString(size_t scope) override;
 };
 
-class Program : public Node {
-    std::unique_ptr<FunctionDef> function;
+struct Program : public Node {
+    std::shared_ptr<FunctionDef> function;
 
-   public:
     Program(token::Tokens& tokens);
-    std::string toString(size_t scope) override;
+    std::string toString(size_t scope = 0) override;
 };
 
-class AST {
+class ast {
     token::Tokens tokens;
 
    public:
-    AST(std::vector<token::Token> tokens);
+    ast(std::vector<token::Token> tokens);
     std::unique_ptr<Program> ParseProgram();
 };
-}  // namespace ast
+}  // namespace parser
